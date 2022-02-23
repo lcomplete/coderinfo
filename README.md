@@ -42,6 +42,6 @@
 - [newspaper](https://github.com/codelucas/newspaper)，将 readability 换成了 newspaper 来进行解析，代码中预留了可以使用不同解析器的数据结构设计。
 - [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) ，这次重新上线前通过这个开源项目来设置内容样式。
 
-## 运行部署文档
+## 运行文档
 
 [Get Started 💻](getstart.md)
