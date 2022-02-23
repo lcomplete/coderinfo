@@ -44,4 +44,4 @@
 
 ## 运行文档
 
-[Get Started 💻](getstart.md)
+[Get Started 💻](getstarted.md)

@@ -127,7 +127,7 @@ WantedBy=multi-user.target
 sudo systemctl enable supervisor.service
 # 或者
 sudo ln -s /usr/lib/systemd/system/supervisor.service /etc/systemd/system/multi-user.target.wants/supervisor.service
-
+```
 
 ### 创建 start.sh
 
@@ -141,7 +141,7 @@ popd
 
 ### 配置 supervisor
 
-```
+```sh
 sudo vim /etc/supervisor/conf.d/myapp.conf
 ```
 
