@@ -44,4 +44,4 @@
 
 ## 运行部署文档
 
-[GetStart 💻](getstart.md)
+[Get Started 💻](getstart.md)
