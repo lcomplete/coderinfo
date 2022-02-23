@@ -1,0 +1,8 @@
+Flask==0.12.5
+lxml==3.7.3
+cssselect==1.0.1
+chardet==3.0.2
+apscheduler==2.1.2
+MySQL-python==1.2.5
+Flask-SQLAlchemy==2.5.1
+newspaper==0.1.0.7

@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% from 'macro/_page.html' import paginate %}
+
+{% block subtitle %}{{ '趣味图' if cur_type=='o_o' else '提神图' }}{% endblock %}
+{% set cur_page=cur_type %}
+
+{% block content %}
+
+    <div id="pic-container"></div>
+
+    <div class="hide container" id="btn-opts">
+        <input type="button" class="btn btn-lg btn-success clear-radius" value=" 换 一 批 " id="change-pic" />
+        <input type="button" class="btn btn-lg btn-primary clear-radius" value=" 加 载 更 多 " id="load-pic" />
+    </div>
+
+{% endblock %}
+
+{% block styles %}
+    <link href="{{ url_for("static",filename="js/fancybox/jquery.fancybox.css") }}" rel="stylesheet" />
+    <link href="{{ url_for("static",filename="js/fancybox/helpers/jquery.fancybox-buttons.css") }}" rel="stylesheet" />
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for("static",filename="js/waterfall/waterfall.min.js") }}"></script>
+    <script type="text/javascript" src="{{ url_for("static",filename="js/fancybox/jquery.fancybox.js") }}"></script>
+    <script type="text/javascript" src="{{ url_for("static",filename="js/fancybox/helpers/jquery.fancybox-buttons.js") }}"></script>
+    <script type="text/javascript">
+        var max_page=1;
+        $('#pic-container').waterfall({
+            itemCls: 'pic-item',
+            colWidth: 272,
+            gutterWidth: 15,
+            gutterHeight: 15,
+            maxPage:max_page,
+            checkImagesLoaded: false,
+            dataType: 'html',
+            path: function(page) {
+                return '{{ url_for('pic.partial',type=cur_type) }}?page=' + page;
+            },
+            callbacks: {
+                loadingFinished: function($loading,isBeyondMaxPage){
+                    if(isBeyondMaxPage)
+                        $("#btn-opts").removeClass("hide");
+                    else
+                        $loading.hide();
+                }
+            }
+        });
+
+        function pic_load(self){
+            var $self=$(self);
+            var width=$self.width();
+            $self.width("auto").height("auto");
+            var raw_width=$self.width();
+            var raw_height=$self.height();
+            var height= raw_height * width/raw_width;
+            $self.height(height);
+            $('#pic-container').waterfall("reLayout");
+        }
+
+        function pic_error(self){
+            $('#pic-container').waterfall('removeItems', $(self).closest('.pic-item'), function() {
+                $('#pic-container').waterfall("reLayout");
+            });
+        }
+
+        $("#load-pic").click(function(){
+            var $loading=$('#pic-container').data("plugin_waterfall").$loading.show();
+            $("#btn-opts").hide();
+            $.get('{{ url_for('pic.partial',type=cur_type) }}?page=' + ++max_page,function(html){
+                $('#pic-container').waterfall('append', $(html), function() {
+                    $loading.hide();
+                    $("#btn-opts").show();
+                });
+            })
+        });
+        $("#change-pic").click(function(){
+            $('#pic-container').waterfall('removeItems', $('.pic-item'), function() {
+                $("#load-pic").click();
+            });
+        });
+
+        $('.fancybox-buttons').fancybox({
+				openEffect  : 'none',
+				closeEffect : 'none',
+				prevEffect : 'none',
+				nextEffect : 'none',
+				closeBtn  : false,
+                type:'image',
+				helpers : {
+					title : {
+						type : 'inside'
+					},
+					buttons	: {}
+				},
+				afterLoad : function() {
+                    var oo=parseInt($(this.element).attr("data-oo"));
+                    var xx=parseInt($(this.element).attr("data-xx"));
+                    var percent= parseInt(oo*100/(oo+xx))
+					this.title = (this.index + 1) + ' / ' + this.group.length + ' &nbsp;&nbsp;&nbsp;&nbsp; '
+                            + '约有 '+percent+'% 的人喜欢';
+				}
+			});
+    </script>
+{% endblock %}

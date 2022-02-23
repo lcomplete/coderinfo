@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+{% from 'macro/_page.html' import paginate %}
+
+{% block title %}{{ config.SITE_TITLE }}{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="article-list col-lg-12">
+                        {% for article in page_articles.items %}
+                            <div class="article-item">
+                                <h4><a href="#" data-url="{{ url_for('home.article',id=article.id) }}"
+                                       class="snap-link">{{ article.short_title }}</a></h4>
+                                <p>{{ article.brief }} ...</p>
+                                <div class="item-opt">
+                                    <span class="item-date">{{ article.create_date }}</span>
+                                    <span class="item-name">[{{ article.site_name }}]</span>
+                                    <a href="{{ article.raw_url }}" target="_blank" class="item-rawurl"></a>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        {{ paginate(page_articles,page_url) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2 slide-sites">
+                <ul class="nav">
+                    <li><a href="{{ url_for('home.index') }}" class="{{ 'selected' if 0==cur_siteid }}">全部</a></li>
+                    {% for site in sites %}
+                        <li>
+                            <a href="{{ url_for('home.index',siteid=site.id) }}"
+                               class="{{ 'selected' if site.id==cur_siteid }}">{{ site.site_name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div id="article_area" class="hide markdown-body">
+            <article id="real-article">
+                <h1 id="a_short_title">标题</h1>
+                <div class="a_opt hide">
+                    <span id="a_update_date"></span>
+                    <span id="a_site_name"></span>
+                    <a href="" target="_blank" id="a_raw_url">🔗</a>
+                </div>
+                <div id="a_summary">
+                    <div class="loading-detail"></div>
+                </div>
+            </article>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/static/css/github-markdown.css" />
+    <link href="{{ url_for("static",filename="js/fancybox/jquery.fancybox.css") }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript"
+            src="{{ url_for("static",filename="js/fancybox/jquery.fancybox.pack.js") }}"></script>
+    <script type="text/javascript">
+        $(".snap-link").click(function (e) {
+            e.preventDefault();
+            var $trigger = $(this);
+            var clone_area = $("#article_area").clone();
+            $.fancybox({
+                'transitionIn': 'fade',
+                'transitionOut': 'fade',
+                'speedIn': 300,
+                'speedOut': 300,
+                helpers:{
+                    overlay:true
+                },
+                content: clone_area,
+                type: "html",
+                margin: 20,
+                padding: 0,
+                wrapCSS: "article-wrap",
+                scrolling: 'no',
+                closeBtn: true,
+                beforeShow: function () {
+                    clone_area.height($(window).height() - 20);
+                    clone_area.removeClass("hide");
+                    var $opt = $trigger.closest(".article-item").find(".item-opt");
+
+                    //var link= $("<a>").attr("target","_blank").attr("href",$opt.find(".item-rawurl").attr("href"));
+                    //link.text($trigger.text()+" 🔗");
+                    clone_area.find("#a_short_title").text($trigger.text());
+                    clone_area.find("#a_raw_url").attr("href", $opt.find(".item-rawurl").attr("href"));
+                    clone_area.find("#a_update_date").text($opt.find(".item-date").text());
+                    clone_area.find("#a_site_name").text($opt.find(".item-name").text());
+                    clone_area.find(".a_opt").removeClass('hide');
+                },
+                afterShow: function () {
+                    $.getJSON($trigger.attr('data-url'), function (data) {
+                        clone_area.find("#a_summary").html(data.summary);
+                    });
+                },
+                onUpdate: function () {
+                    clone_area.height($(window).height() - 20);
+                }
+            });
+
+        });
+    </script>
+{% endblock %}

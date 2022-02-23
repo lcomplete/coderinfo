@@ -1,0 +1,10 @@
+{% for pic in pics %}
+    {% set pic_urls=pic.pic_urls.split(',') %}
+    {% for pic_url in pic_urls %}
+        <div class="pic-item">
+            <a class="fancybox-buttons" data-fancybox-group="button" href="{{ pic_url }}" data-oo="{{ pic.oo }}" data-xx="{{ pic.xx }}">
+                <img src="{{ pic_url }}" width="242" height="300" onerror="pic_error(this)" onload="pic_load(this)"/>
+            </a>
+        </div>
+    {% endfor %}
+{% endfor %}
